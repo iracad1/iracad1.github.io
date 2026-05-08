@@ -92,6 +92,12 @@
 				$intro.prependTo($sidebar);
 			});
 
+	// Format an ISO date string (YYYY-MM-DD) to a readable display date.
+		function formatDate(iso) {
+			var d = new Date(iso + 'T00:00:00');
+			return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+		}
+
 	// Render posts from posts.js data.
 		(function() {
 			var $pagination = $main.find('ul.pagination');
@@ -110,7 +116,7 @@
 					       subtitleHtml,
 					'    </div>',
 					'    <div class="meta">',
-					'      <time class="published" datetime="' + post.date + '">' + post.dateDisplay + '</time>',
+					'      <time class="published" datetime="' + post.date + '">' + formatDate(post.date) + '</time>',
 					'    </div>',
 					'  </header>',
 					   imageHtml,
