@@ -6,7 +6,7 @@
 -->
 <html>
 	<head>
-		<title>Single - Future Imperfect by HTML5 UP</title>
+		<title>About - Future Imperfect</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
@@ -86,6 +86,17 @@
 
 				<!-- Main -->
 					<div id="main">
+
+						<article class="post">
+							<header>
+								<div class="title">
+									<h2>About</h2>
+									<p>A little bit about this site</p>
+								</div>
+							</header>
+							<p>Write something about yourself or this site here.</p>
+						</article>
+
 					</div>
 
 				<!-- Footer -->
@@ -107,56 +118,7 @@
 			<script src="assets/js/browser.min.js"></script>
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
-			<script src="assets/js/posts.js"></script>
 			<script src="assets/js/main.js"></script>
-			<script>
-				(function() {
-					var params = new URLSearchParams(window.location.search);
-					var index = parseInt(params.get('post'), 10);
-					var post = (!isNaN(index) && posts[index]) ? posts[index] : null;
-					var $main = $('#main');
-
-					if (!post) {
-						$main.html('<article class="post"><p>Post not found. <a href="index.html">Go back home.</a></p></article>');
-						return;
-					}
-
-					document.title = post.title + ' - Future Imperfect';
-
-					var subtitleHtml = post.subtitle ? '<p>' + post.subtitle + '</p>' : '';
-					var imageHtml = post.image
-						? '<span class="image featured"><img src="' + post.image + '" alt="" /></span>'
-						: '';
-
-					var contentHtml = post.content
-						? post.content.split('\n\n').map(function(p) { return '<p>' + p + '</p>'; }).join('')
-						: '';
-
-					var pdfsHtml = '';
-					if (post.pdfs && post.pdfs.length) {
-						pdfsHtml = post.pdfs.map(function(pdf) {
-							return '<embed src="' + pdf.src + '" type="application/pdf" class="pdf-embed" title="' + pdf.label + '" />';
-						}).join('');
-					}
-
-					$main.html([
-						'<article class="post">',
-						'  <header>',
-						'    <div class="title">',
-						'      <h2>' + post.title + '</h2>',
-						       subtitleHtml,
-						'    </div>',
-						'    <div class="meta">',
-						'      <time class="published" datetime="' + post.date + '">' + post.dateDisplay + '</time>',
-						'    </div>',
-						'  </header>',
-						   imageHtml,
-						   contentHtml,
-						   pdfsHtml,
-						'</article>'
-					].join('\n'));
-				})();
-			</script>
 
 	</body>
 </html>

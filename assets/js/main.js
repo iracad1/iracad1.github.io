@@ -92,4 +92,98 @@
 				$intro.prependTo($sidebar);
 			});
 
+	// Render posts from posts.js data.
+		(function() {
+			var $pagination = $main.find('ul.pagination');
+			posts.forEach(function(post, index) {
+				var link = 'single.html?post=' + index;
+				var subtitleHtml = post.subtitle ? '<p>' + post.subtitle + '</p>' : '';
+				var imageHtml = post.image
+					? '<a href="' + link + '" class="image featured"><img src="' + post.image + '" alt="" /></a>'
+					: '';
+
+				var $article = $([
+					'<article class="post">',
+					'  <header>',
+					'    <div class="title">',
+					'      <h2><a href="' + link + '">' + post.title + '</a></h2>',
+					       subtitleHtml,
+					'    </div>',
+					'    <div class="meta">',
+					'      <time class="published" datetime="' + post.date + '">' + post.dateDisplay + '</time>',
+					'    </div>',
+					'  </header>',
+					   imageHtml,
+					'  <p>' + post.excerpt + '</p>',
+					'  <footer>',
+					'    <ul class="actions"><li><a href="' + link + '" class="button large">Continue Reading</a></li></ul>',
+					'  </footer>',
+					'</article>'
+				].join('\n'));
+
+				$article.insertBefore($pagination);
+			});
+		})();
+
+	// Pagination.
+		var postsPerPage = 3;
+		var currentPage = 1;
+		var $posts = $main.find('article.post');
+		var $prevBtn = $('#prev-page');
+		var $nextBtn = $('#next-page');
+		var $pageNumbers = $('#page-numbers');
+
+		function showPage(page) {
+			var totalPages = Math.ceil($posts.length / postsPerPage);
+			var start = (page - 1) * postsPerPage;
+			var end = start + postsPerPage;
+
+			$posts.each(function(i) {
+				if (i >= start && i < end)
+					$(this).show();
+				else
+					$(this).hide();
+			});
+
+			$prevBtn.toggleClass('disabled', page <= 1);
+			$nextBtn.toggleClass('disabled', page >= totalPages);
+
+			$pageNumbers.empty();
+			for (var i = 1; i <= totalPages; i++) {
+				var $btn = $('<a href="#" class="button">' + i + '</a>');
+				if (i === page) $btn.addClass('active');
+				$btn.on('click', (function(p) {
+					return function(e) {
+						e.preventDefault();
+						showPage(p);
+						window.scrollTo(0, 0);
+					};
+				})(i));
+				$pageNumbers.append($btn);
+			}
+
+			currentPage = page;
+		}
+
+		if ($posts.length > 0) {
+			showPage(1);
+
+			$prevBtn.on('click', function(e) {
+				e.preventDefault();
+				if (currentPage > 1) {
+					showPage(currentPage - 1);
+					window.scrollTo(0, 0);
+				}
+			});
+
+			$nextBtn.on('click', function(e) {
+				e.preventDefault();
+				var totalPages = Math.ceil($posts.length / postsPerPage);
+				if (currentPage < totalPages) {
+					showPage(currentPage + 1);
+					window.scrollTo(0, 0);
+				}
+			});
+		}
+
 })(jQuery);
