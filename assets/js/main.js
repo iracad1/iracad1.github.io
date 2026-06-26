@@ -139,7 +139,7 @@
 		var $nextBtn = $('#next-page');
 		var $pageNumbers = $('#page-numbers');
 
-		function showPage(page) {
+		function showPage(page, skipHash) {
 			var totalPages = Math.ceil($posts.length / postsPerPage);
 			var start = (page - 1) * postsPerPage;
 			var end = start + postsPerPage;
@@ -169,10 +169,14 @@
 			}
 
 			currentPage = page;
+			if (!skipHash)
+				window.location.replace('#page-' + page);
 		}
 
 		if ($posts.length > 0) {
-			showPage(1);
+			var hashMatch = window.location.hash.match(/^#page-(\d+)$/);
+			var initialPage = hashMatch ? parseInt(hashMatch[1], 10) : 1;
+			showPage(initialPage, true);
 
 			$prevBtn.on('click', function(e) {
 				e.preventDefault();

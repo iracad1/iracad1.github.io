@@ -11,7 +11,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 	</head>
-	<body class="single is-preload">
+	<body class="single is-preload" style="background-color: #f4efe9">
 
 		<!-- Wrapper -->
 			<div id="wrapper">
@@ -74,6 +74,13 @@
 						}).join('');
 					}
 
+					var extraImagesHtml = '';
+					if (post.images && post.images.length > 1) {
+						extraImagesHtml = post.images.slice(1).map(function(src) {
+							return '<span class="image featured"><img src="' + src + '" alt="" /></span>';
+						}).join('');
+					}
+
 					$main.html([
 						'<article class="post">',
 						'  <header>',
@@ -87,6 +94,7 @@
 						'  </header>',
 						   imageHtml,
 						   contentHtml,
+						   extraImagesHtml,
 						   pdfsHtml,
 						'</article>'
 					].join('\n'));
