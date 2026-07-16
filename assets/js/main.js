@@ -92,11 +92,47 @@
 				$intro.prependTo($sidebar);
 			});
 
-	// Format an ISO date string (YYYY-MM-DD) to a readable display date.
-		function formatDate(iso) {
-			var d = new Date(iso + 'T00:00:00');
-			return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+	// Image gallery: build browsable slideshow markup for a set of project images.
+		window.buildGallery = function(images) {
+			if (!images || !images.length)
+				return '';
+
+			var slides = images.map(function(src, i) {
+				return '<img src="' + src + '" alt="" class="gallery-slide' + (i === 0 ? ' active' : '') + '" />';
+			}).join('');
+
+			var nav = '', dots = '';
+			if (images.length > 1) {
+				nav = '<a href="#" class="gallery-nav gallery-prev" aria-label="Previous photo">&#10094;</a>' +
+					'<a href="#" class="gallery-nav gallery-next" aria-label="Next photo">&#10095;</a>';
+				dots = '<div class="gallery-dots">' + images.map(function(_, i) {
+					return '<a href="#" class="gallery-dot' + (i === 0 ? ' active' : '') + '" data-index="' + i + '"></a>';
+				}).join('') + '</div>';
+			}
+
+			return '<div class="gallery"><div class="gallery-frame">' + slides + nav + '</div>' + dots + '</div>';
+		};
+
+		function galleryShow($gallery, index) {
+			var $slides = $gallery.find('.gallery-slide');
+			var count = $slides.length;
+			index = ((index % count) + count) % count;
+			$slides.removeClass('active').eq(index).addClass('active');
+			$gallery.find('.gallery-dot').removeClass('active').eq(index).addClass('active');
 		}
+
+		$body.on('click', '.gallery-prev, .gallery-next', function(event) {
+			event.preventDefault();
+			var $gallery = $(this).closest('.gallery');
+			var $slides = $gallery.find('.gallery-slide');
+			var current = $slides.index($gallery.find('.gallery-slide.active'));
+			galleryShow($gallery, current + ($(this).hasClass('gallery-next') ? 1 : -1));
+		});
+
+		$body.on('click', '.gallery-dot', function(event) {
+			event.preventDefault();
+			galleryShow($(this).closest('.gallery'), parseInt($(this).attr('data-index'), 10));
+		});
 
 	// Render posts from posts.js data.
 		(function() {
@@ -104,22 +140,17 @@
 			posts.forEach(function(post, index) {
 				var link = 'single.html?post=' + index;
 				var subtitleHtml = post.subtitle ? '<p>' + post.subtitle + '</p>' : '';
-				var imageHtml = post.image
-					? '<a href="' + link + '" class="image featured"><img src="' + post.image + '" alt="" /></a>'
-					: '';
+				var galleryHtml = buildGallery(post.images && post.images.length ? post.images : (post.image ? [post.image] : []));
 
 				var $article = $([
-					'<article class="post">',
+					'<article class="post project-card">',
 					'  <header>',
 					'    <div class="title">',
 					'      <h2><a href="' + link + '">' + post.title + '</a></h2>',
 					       subtitleHtml,
 					'    </div>',
-					'    <div class="meta">',
-					'      <time class="published" datetime="' + post.date + '">' + formatDate(post.date) + '</time>',
-					'    </div>',
 					'  </header>',
-					   imageHtml,
+					   galleryHtml,
 					'  <p>' + post.excerpt + '</p>',
 					'  <footer>',
 					'    <ul class="actions"><li><a href="' + link + '" class="button large">Continue Reading</a></li></ul>',
@@ -131,8 +162,8 @@
 			});
 		})();
 
-	// Pagination.
-		var postsPerPage = 3;
+	// Pagination: one project per page so each is highlighted on its own.
+		var postsPerPage = 1;
 		var currentPage = 1;
 		var $posts = $main.find('article.post');
 		var $prevBtn = $('#prev-page');
@@ -151,26 +182,30 @@
 					$(this).hide();
 			});
 
-			$prevBtn.toggleClass('disabled', page <= 1);
-			$nextBtn.toggleClass('disabled', page >= totalPages);
-
 			$pageNumbers.empty();
 			for (var i = 1; i <= totalPages; i++) {
-				var $btn = $('<a href="#" class="button">' + i + '</a>');
+				var label = (postsPerPage === 1 && typeof posts !== 'undefined' && posts[i - 1]) ? posts[i - 1].title : i;
+				var $btn = $('<a href="#" class="button">' + label + '</a>');
 				if (i === page) $btn.addClass('active');
 				$btn.on('click', (function(p) {
 					return function(e) {
 						e.preventDefault();
 						showPage(p);
-						window.scrollTo(0, 0);
 					};
 				})(i));
 				$pageNumbers.append($btn);
 			}
 
 			currentPage = page;
-			if (!skipHash)
+			if (!skipHash) {
 				window.location.replace('#page-' + page);
+
+				// Scroll to the project itself (not the page top) so it is
+				// immediately in view, even on phones where the intro sits above it.
+				var article = $posts.eq(start)[0];
+				if (article)
+					article.scrollIntoView({ behavior: 'auto', block: 'start' });
+			}
 		}
 
 		if ($posts.length > 0) {
@@ -178,21 +213,17 @@
 			var initialPage = hashMatch ? parseInt(hashMatch[1], 10) : 1;
 			showPage(initialPage, true);
 
+			// Prev/next wrap around: past the last project loops to the first and vice versa.
 			$prevBtn.on('click', function(e) {
 				e.preventDefault();
-				if (currentPage > 1) {
-					showPage(currentPage - 1);
-					window.scrollTo(0, 0);
-				}
+				var totalPages = Math.ceil($posts.length / postsPerPage);
+				showPage(currentPage > 1 ? currentPage - 1 : totalPages);
 			});
 
 			$nextBtn.on('click', function(e) {
 				e.preventDefault();
 				var totalPages = Math.ceil($posts.length / postsPerPage);
-				if (currentPage < totalPages) {
-					showPage(currentPage + 1);
-					window.scrollTo(0, 0);
-				}
+				showPage(currentPage < totalPages ? currentPage + 1 : 1);
 			});
 		}
 
