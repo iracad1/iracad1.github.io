@@ -3628,6 +3628,8 @@ input, select, textarea {
 	overflow: hidden;
 	border-radius: 0.35em;
 	background: #e8e1d6;
+	margin: 0 auto;
+	max-height: 62vh;
 }
 
 .gallery .gallery-slide {
@@ -3768,7 +3770,7 @@ article.post {
 	.post.project-card {
 		display: grid;
 		grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-		grid-template-rows: auto auto 1fr;
+		grid-template-rows: auto 1fr auto auto 1fr;
 		column-gap: 2.5em;
 	}
 
@@ -3778,7 +3780,7 @@ article.post {
 
 	.post.project-card > .gallery {
 		grid-column: 1;
-		grid-row: 2 / 4;
+		grid-row: 2 / 6;
 		margin-bottom: 0.5em;
 	}
 
@@ -3788,14 +3790,14 @@ article.post {
 
 	#main .post.project-card > p {
 		grid-column: 2;
-		grid-row: 2;
+		grid-row: 3;
 		-webkit-line-clamp: 9;
+		margin-bottom: 1.5em;
 	}
 
 	.post.project-card > footer {
 		grid-column: 2;
-		grid-row: 3;
-		align-self: start;
+		grid-row: 4;
 	}
 
 }
@@ -3824,6 +3826,35 @@ article.post {
 
 }
 
+/* Slimmer title band on single pages (project, About, Contact) */
+body.single .post > header .title {
+	padding: 2.25em 3em 2em 3em;
+}
+
+@media screen and (max-width: 1280px) {
+
+	/* Center the footer when it spans the full width */
+	#footer {
+		text-align: center;
+	}
+
+	/* Tighter gaps between stacked sidebar sections */
+	#sidebar {
+		margin-top: 0.5em;
+		padding-top: 1.25em;
+	}
+
+	#sidebar > * {
+		margin: 1.75em 0 0 0;
+		padding: 1.75em 0 0 0;
+	}
+
+	#sidebar > :first-child {
+		margin-top: 0;
+	}
+
+}
+
 /* Page banner images (About / Contact) */
 .page-banner {
 	display: block;
@@ -3837,9 +3868,9 @@ article.post {
 /* Contact page: photo beside details on wide screens */
 .contact-split {
 	display: grid;
-	grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-	grid-gap: 2.5em;
-	gap: 2.5em;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	grid-gap: 3em;
+	gap: 3em;
 	align-items: center;
 	margin-bottom: 1em;
 }
@@ -3901,6 +3932,14 @@ article.post {
 		width: 100% !important;
 	}
 
+	ul.actions.pagination {
+		margin-bottom: 1em;
+	}
+
+	.post.project-card {
+		margin-bottom: 1.25em;
+	}
+
 	ul.actions.pagination li {
 		padding: 0;
 		width: auto;
@@ -3908,6 +3947,12 @@ article.post {
 		-webkit-flex-grow: 0;
 		-ms-flex-grow: 0;
 		flex-grow: 0;
+		display: flex;
+		-moz-align-items: center;
+		-webkit-align-items: center;
+		-ms-align-items: center;
+		align-items: center;
+		line-height: 0;
 	}
 
 	#page-numbers {
